@@ -1058,6 +1058,19 @@
                 android:resource="@xml/sleep_alarm_widget_info" />
         </receiver>
         <receiver
+            android:name=".NapAlarmWidget"
+            android:label="@string/appwidget_nap_alarm_widget_label"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="nodomain.freeyourgadget.gadgetbridge.NAP_ALARM_WIDGET_CLICK" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nap_alarm_widget_info" />
+        </receiver>
+        <receiver
             android:name=".Widget"
             android:label="@string/widget_listing_label"
             android:exported="false">
@@ -1117,6 +1130,13 @@
         </activity>
 
         <activity android:name=".activities.SleepAlarmWidgetConfigurationActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.NapAlarmWidgetConfigurationActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

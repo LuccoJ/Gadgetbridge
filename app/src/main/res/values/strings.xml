@@ -3067,6 +3067,16 @@
     <string name="add_widget">Add widget</string>
     <string name="appwidget_setting_alarm">Setting alarm for %1$02d:%2$02d</string>
     <string name="appwidget_sleep_alarm_widget_label">Sleep Alarm</string>
+    <string name="appwidget_nap_alarm_widget_label">Nap Alarm</string>
+    <string name="nap_alarm_widget_idle">Nap\n%1$d min</string>
+    <string name="nap_alarm_widget_waiting">Nap\n%1$d/%2$d min</string>
+    <string name="nap_alarm_widget_asleep">Zzz\n%1$s</string>
+    <string name="nap_alarm_started">Nap alarm set: you will be woken after %1$d minutes of sleep</string>
+    <string name="nap_alarm_cancelled">Nap alarm cancelled</string>
+    <string name="nap_alarm_no_slot">This device has no alarm slot available for the nap alarm</string>
+    <string name="nap_alarm_no_device">No connected device can both detect sleep and set alarms</string>
+    <string name="nap_alarm_select_duration_title">Amount of sleep</string>
+    <string name="nap_alarm_duration_minutes">%1$d minutes</string>
     <string name="widget_listing_label">Status and Alarms</string>
     <string name="widget_set_alarm_after">Set alarm after:</string>
     <string name="widget_5_minutes">5 minutes</string>

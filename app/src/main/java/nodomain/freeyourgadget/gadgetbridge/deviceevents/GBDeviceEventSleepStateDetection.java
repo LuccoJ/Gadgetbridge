@@ -32,6 +32,7 @@ import nodomain.freeyourgadget.gadgetbridge.R;
 import nodomain.freeyourgadget.gadgetbridge.activities.devicesettings.DeviceSettingsPreferenceConst;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.SleepState;
+import nodomain.freeyourgadget.gadgetbridge.util.NapAlarm;
 import nodomain.freeyourgadget.gadgetbridge.util.preferences.DevicePrefs;
 
 public class GBDeviceEventSleepStateDetection extends GBDeviceEvent {
@@ -54,6 +55,8 @@ public class GBDeviceEventSleepStateDetection extends GBDeviceEvent {
         if (this.sleepState == SleepState.UNKNOWN) {
             return;
         }
+
+        NapAlarm.onSleepStateChanged(context, device, this.sleepState);
 
         final String actionPreferenceKey, messagePreferenceKey, packagePreferenceKey;
         final int defaultBroadcastMessageResource;
