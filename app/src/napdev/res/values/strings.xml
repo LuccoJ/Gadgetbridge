@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string translatable="false" name="pebble_content_provider">com.getpebble.android.napdev.provider</string>
+    <string translatable="false" name="app_name">Gadgetbridge (napdev)</string>
+</resources>

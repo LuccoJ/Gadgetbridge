@@ -229,6 +229,15 @@ android {
             }
         }
 
+        // Local testing only, not meant for upstream: installs next to any other Gadgetbridge
+        // variant (see app/src/napdev/res/values/strings.xml for the Pebble provider authority)
+        napdev {
+            initWith debug
+            applicationIdSuffix ".napdev"
+            versionNameSuffix "-napdev"
+            matchingFallbacks = ["debug"]
+        }
+
         nopebble {
             applicationIdSuffix ".nightly_nopebble"
             versionNameSuffix "-${getGitHashShort}"
