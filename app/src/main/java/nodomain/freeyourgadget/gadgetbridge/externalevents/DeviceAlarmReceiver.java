@@ -116,19 +116,29 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
             }
             final ArrayList<Integer> days = intent.getIntegerArrayListExtra(EXTRA_DAYS); // Calendar.SUNDAY, Calendar.MONDAY, Cal..;
             int repetition = convertRepetitionMask(days);
-            // find the next free slot: a dismissed alarm without any title
+            // find the next free slot: preferably an unused one, so the user's own alarms are
+            // left alone; otherwise a dismissed alarm without any title
             // (this way the user can protect dismissed alarms by naming them)
+            Alarm free = null;
             for (Alarm alarm : alarms) {
-                if (!alarm.getEnabled() && (
-                        alarm.getTitle() == null || alarm.getTitle().isEmpty())) {
-                    updateAlarm(
-                            alarm, true, hour, minute, repetition,
-                            title
-                    );
-                    DBHelper.store(alarm);
-                    changed = true;
+                if (alarm.getUnused()) {
+                    free = alarm;
                     break;
                 }
+            }
+            if (free == null) {
+                for (Alarm alarm : alarms) {
+                    if (!alarm.getEnabled() && (
+                            alarm.getTitle() == null || alarm.getTitle().isEmpty())) {
+                        free = alarm;
+                        break;
+                    }
+                }
+            }
+            if (free != null) {
+                updateAlarm(free, true, hour, minute, repetition, title);
+                DBHelper.store(free);
+                changed = true;
             }
             if (!changed) {
                 LOG.error("No free alarm slot was found; A slot is free when it's disabled and has no title");
@@ -163,8 +173,10 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
                                 && (minutes == -1 || alarm.getMinute() == minutes)
                         )
                 ) {
-                    // dismiss the alarm and clear its title, so it can be set again
+                    // dismiss the alarm and clear its title, so it can be set again;
+                    // its slot is free again, like deleting it in the alarm list
                     updateAlarm(alarm, false, alarm.getHour(), alarm.getMinute(), 0, "");
+                    alarm.setUnused(true);
                     DBHelper.store(alarm);
                     changed = true;
                 }
