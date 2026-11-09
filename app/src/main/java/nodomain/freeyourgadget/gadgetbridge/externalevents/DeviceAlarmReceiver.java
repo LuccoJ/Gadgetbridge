@@ -223,6 +223,11 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
         alarm.setRepetition(repetition);
         alarm.setTitle(title);
         alarm.setEnabled(enable);
+        if (enable) {
+            // Like switching an alarm on in the alarm list: otherwise a slot the device
+            // reported as unused is sent to it disabled
+            alarm.setUnused(false);
+        }
     }
 
     public IntentFilter buildFilter() {
