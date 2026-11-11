@@ -33,6 +33,9 @@ import java.util.Objects;
 
 import nodomain.freeyourgadget.gadgetbridge.GBApplication;
 import nodomain.freeyourgadget.gadgetbridge.database.DBHelper;
+import nodomain.freeyourgadget.gadgetbridge.devices.DeviceCoordinator;
+import nodomain.freeyourgadget.gadgetbridge.devices.huami.HuamiCoordinator;
+import nodomain.freeyourgadget.gadgetbridge.devices.huami.zeppos.ZeppOsCoordinator;
 import nodomain.freeyourgadget.gadgetbridge.entities.Alarm;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.DeviceService;
@@ -101,6 +104,7 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
         }
 
         boolean changed = false;
+        final ArrayList<Alarm> touched = new ArrayList<>();
         final String mode = intent.getStringExtra(EXTRA_ALARM_SEARCH_MODE);
         final String title = intent.getStringExtra(EXTRA_TITLE);
         if (COMMAND_SET_ALARM.equals(action)) {
@@ -138,6 +142,7 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
             if (free != null) {
                 updateAlarm(free, true, hour, minute, repetition, title);
                 DBHelper.store(free);
+                touched.add(free);
                 changed = true;
             }
             if (!changed) {
@@ -178,6 +183,7 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
                     updateAlarm(alarm, false, alarm.getHour(), alarm.getMinute(), 0, "");
                     alarm.setUnused(true);
                     DBHelper.store(alarm);
+                    touched.add(alarm);
                     changed = true;
                 }
             }
@@ -193,8 +199,21 @@ public class DeviceAlarmReceiver extends BroadcastReceiver {
             LocalBroadcastManager.getInstance(context).sendBroadcast(
                     new Intent(DeviceService.ACTION_SAVE_ALARMS)
             );
-            GBApplication.deviceService(targetDevice).onSetAlarms(alarms);
+            // Send only the alarms changed here where the device writes each slot by itself, so
+            // alarms changed on the watch alone aren't overwritten by stale copies from the DB
+            final boolean slotBySlot = writesAlarmSlotsSeparately(targetDevice.getDeviceCoordinator());
+            GBApplication.deviceService(targetDevice).onSetAlarms(slotBySlot ? touched : alarms);
         }
+    }
+
+    /**
+     * Whether sending a subset of the alarms leaves the others on the device untouched.
+     * True for the pre-Zepp OS Huami devices, whose HuamiSupport.onSetAlarms writes one
+     * message per given alarm to that alarm's slot; other protocols may treat the list as
+     * the complete set, so they keep getting all alarms.
+     */
+    private static boolean writesAlarmSlotsSeparately(final DeviceCoordinator coordinator) {
+        return coordinator instanceof HuamiCoordinator && !(coordinator instanceof ZeppOsCoordinator);
     }
 
     private static int convertRepetitionMask(ArrayList<Integer> days) {
